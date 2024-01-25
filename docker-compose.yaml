@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15.1
+    container_name: my-postgres-container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: docker_tutorial_api
+    ports:
+      - "5433:5432"
+    networks:
+      - my-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-node-app-container
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: docker_tutorial_api
+      DB_PORT: 5432
+    ports:
+      - "3000:3000"
+    networks:
+      - my-network
+    depends_on:
+      - postgres
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
